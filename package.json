@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/CaitieCat/tinyAppThree/issues"
   },
-  "homepage": "https://github.com/CaitieCat/tinyAppThree#readme"
+  "homepage": "https://github.com/CaitieCat/tinyAppThree#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
