@@ -77,9 +77,17 @@ app.post("/login", (req, res) => {
 
 //logout
 app.post("/logout", (req, res) => {
-    res.clearCookie("username");
-    res.redirect("/urls");
-  });
+  res.clearCookie("username");
+  res.redirect("/urls");
+});
+
+//register
+app.get("/register", (req, res) =>{
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("register", templateVars);
+});
 
 //Listen for requests on PORT
 app.listen(PORT, () => {
