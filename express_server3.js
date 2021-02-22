@@ -9,22 +9,52 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
-const randomID = function generateRandomString() {
+const randomID = function() {
   let randomString = Math.random().toString(36).slice(2, 8);
   return randomString;
 };
 
+const findUserEmail = function(email, userDB) {
+  for (const each in userDB) {
+    if (userDB[each]['email'] === email){
+      return true;
+    }
+  }
+  return false;
+};
+
+const findID = function(email, userDB){
+  for (const each in userDB) {
+    if (userDB[each]['email'] === email){
+      return each;
+    }
+  }
+  return null;
+}
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
 //render the /urls route to show all urls
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_index3", templateVars);
 });
@@ -37,7 +67,10 @@ app.post("/urls", (req, res) => {
 
 // Page to add a new URL
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new3");
+  const templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("urls_new3", templateVars);
 });
 
 //View the URL data
@@ -45,7 +78,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_show3", templateVars);
 });
@@ -70,23 +103,59 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 //login
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("login", templateVars);
+});
+
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
+  const userToLogin = findID(req.body.email, users);
+  if (req.body.email === '' || req.body.password === '') {
+    res.sendStatus(403);
+  } else if (findUserEmail(req.body.email, users) !== true) {
+    res.sendStatus(403);
+  } else {
+    if(users[userToLogin]["password"] === req.body.password){
+      res.cookie("user_id", userToLogin);
+      res.redirect("/urls");
+    } else {
+      res.send("Bad password");
+    }
+  }
 });
 
 //logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
-//register
-app.get("/register", (req, res) =>{
+//registration info
+app.get("/register", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("register", templateVars);
+});
+
+//adds a new user after registering
+app.post("/register", (req, res) => {
+  const newUserID = randomID();
+  if (req.body.email === '' || req.body.password === ''){
+    res.sendStatus(400);
+  } else if (findUserEmail(req.body.email, users) === true) {
+    res.sendStatus(400);
+  } else {
+    users[newUserID] = {
+      id: newUserID,
+      email: req.body.email,
+      password: req.body.password
+    }
+    res.cookie("user_id", newUserID);
+    res.redirect("/urls");
+  };
 });
 
 //Listen for requests on PORT
