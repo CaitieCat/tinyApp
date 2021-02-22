@@ -2,8 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
@@ -41,11 +43,18 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show3", templateVars);
 });
 
+
 //Redirect page to longURL
 app.get("/u/:shortURL", (req, res) => {
     const longURL = urlDatabase[req.params.shortURL];
     res.redirect(longURL);
-  });
+});
+
+//update URL
+app.post("/urls/:id", (req, res) => {
+  urlDatabase[req.params.id] = req.body.updatedURL;
+  res.redirect(`/urls/${req.params.id}`);
+});
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
