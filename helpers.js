@@ -34,8 +34,8 @@ const urlsOfUser = function(userID, urlDB) {
 };
 
 const getUserByEmail = function(email, database) {
-  for (const each in database){
-    if (database[each][email] === email){
+  for (const each in database) {
+    if (database[each][email] === email) {
       return database[each];
     }
   }
