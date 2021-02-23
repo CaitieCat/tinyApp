@@ -43,6 +43,10 @@ const users = {
   }
 };
 
+app.get("/", (req, res) => {
+  res.redirect("/urls");
+});
+
 //render the /urls route to show all urls
 app.get("/urls", (req, res) => {
   if (req.session.user_id !== undefined) {
