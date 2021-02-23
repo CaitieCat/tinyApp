@@ -10,7 +10,7 @@ const { findUserEmail, findID, randomID, urlsOfUser } = require("./helpers");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
-  keys: ['7f69fa85-caec-4d9c-acd7-eebdccb368d5', 'f13b4d38-41c4-46d3-9ef6-8836d03cd8eb'],
+  keys: ["user_id"],
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
@@ -45,13 +45,17 @@ const users = {
 
 //render the /urls route to show all urls
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    urls: urlsOfUser(req.session.user_id, urlDatabase),
-    user: users[req.session.user_id]
-  };
-  res.render("urls_index3", templateVars);
+  if (req.session.user_id !== undefined) {
+    const templateVars = {
+      urls: urlsOfUser(req.session.user_id, urlDatabase),
+      user: users[req.session.user_id]
+    };
+    res.render("urls_index3", templateVars);
+    } else {
+      res.redirect("/login");
+    }
 });
-
+// add a new URL
 app.post("/urls", (req, res) => {
   const newShortURL = randomID();
   urlDatabase[newShortURL] = {
@@ -100,7 +104,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 //update URL
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.updatedURL;
+  urlDatabase[req.params.id]["longURL"] = req.body.updatedURL;
   res.redirect(`/urls/${req.params.id}`);
 });
 
