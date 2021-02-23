@@ -14,7 +14,7 @@ app.use(cookieSession({
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+}));
 
 app.set("view engine", "ejs");
 
@@ -57,7 +57,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[newShortURL] = {
     longURL: req.body.longURL,
     userID: req.session.user_id
-  }
+  };
   res.redirect(`/urls/${newShortURL}`);
 });
 
@@ -80,8 +80,8 @@ app.get("/urls/:shortURL", (req, res) => {
     longURL: urlDatabase[req.params.shortURL]["longURL"],
     user: users[req.session.user_id]
   };
-  if (req.session.user_id !== undefined){
-    if (urlDatabase[req.params.shortURL]["userID"] === req.session.user_id){
+  if (req.session.user_id !== undefined) {
+    if (urlDatabase[req.params.shortURL]["userID"] === req.session.user_id) {
       res.render("urls_show3", templateVars);
     } else {
       res.send("This url doesn't belong to you");
