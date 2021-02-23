@@ -51,9 +51,9 @@ app.get("/urls", (req, res) => {
       user: users[req.session.user_id]
     };
     res.render("urls_index3", templateVars);
-    } else {
-      res.redirect("/login");
-    }
+  } else {
+    res.redirect("/login");
+  }
 });
 // add a new URL
 app.post("/urls", (req, res) => {
